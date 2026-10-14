@@ -1,0 +1,15 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="card">
+  <h3 style="margin-top:0">{{ atext.tables_qr }}</h3>
+  <div class="grid cols-3">
+    {% for f in filenames %}
+    <div style="text-align:center;background:#141310;padding:10px;border-radius:4px">
+      <img src="/static/images/qr/{{ f }}" style="width:100%;background:#fff;padding:8px;border-radius:4px">
+      <p style="font-size:12px;margin:6px 0 0">{{ loop.index }}</p>
+      <a href="/static/images/qr/{{ f }}" download class="btn secondary" style="margin-top:6px;display:inline-block;padding:6px 10px;font-size:11px">Download</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

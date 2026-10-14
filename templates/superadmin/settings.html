@@ -1,0 +1,44 @@
+{% extends "superadmin/_base.html" %}
+{% block title %}Platform Settings{% endblock %}
+{% block content %}
+<div class="grid cols-2">
+  <div class="card">
+    <h3 style="margin-top:0">Platform Identity</h3>
+    <form method="POST" enctype="multipart/form-data">
+      <label>Platform Name</label>
+      <input name="platform_name" value="{{ settings.get('platform_name','') }}">
+      <label>Logo</label>
+      <input type="file" name="logo">
+      <label>Demo / Instructions Video (YouTube URL)</label>
+      <input name="demo_video_url" value="{{ settings.get('demo_video_url','') }}">
+      <label>Main Landing Page — Facebook Page URL</label>
+      <input name="facebook_url" value="{{ settings.get('facebook_url','') }}" placeholder="https://facebook.com/yourpage">
+      <label>Main Landing Page — Instagram URL</label>
+      <input name="instagram_url" value="{{ settings.get('instagram_url','') }}" placeholder="https://instagram.com/yourpage">
+      <label>Main Landing Page — YouTube Channel URL</label>
+      <input name="youtube_url" value="{{ settings.get('youtube_url','') }}" placeholder="https://youtube.com/@yourchannel">
+      <label>Bank Details (text)</label>
+      <textarea name="bank_details_text" rows="4">{{ settings.get('bank_details_text','') }}</textarea>
+      <label>Bank Details Image (screenshot/passbook photo)</label>
+      <input type="file" name="bank_details_image">
+      {% if settings.get('bank_details_image') %}
+      <img src="/static/images/bg/{{ settings.get('bank_details_image') }}" style="max-width:100%;margin-top:8px;border-radius:6px">
+      {% endif %}
+      <button type="submit" style="margin-top:14px">Save</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Country Monthly Fees</h3>
+    {% for c in countries %}
+    <form method="POST" action="{{ url_for('superadmin.update_country_fee', code=c.code) }}" style="margin-bottom:14px;border-bottom:1px solid #3a362e;padding-bottom:14px">
+      <label>{{ c.name }} ({{ c.currency_symbol }}) — {{ c.lang_primary }}/{{ c.lang_secondary }}</label>
+      <div style="display:flex;gap:8px">
+        <input type="number" name="monthly_fee" value="{{ c.monthly_fee }}">
+        <button type="submit" style="width:auto">Update</button>
+      </div>
+    </form>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

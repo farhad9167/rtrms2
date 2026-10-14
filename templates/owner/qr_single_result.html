@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR — {{ table_label }}</title>
+<style>
+  body{font-family:'Segoe UI',sans-serif;background:#f4f0e8;margin:0;padding:24px;color:#1a1a1a}
+  .toolbar{max-width:400px;margin:0 auto 18px;display:flex;gap:10px;justify-content:center}
+  .toolbar button, .toolbar a{
+    padding:10px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;
+    font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;color:#1a1a1a;
+  }
+  .toolbar .primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+
+  .qr-card{
+    width:2.5in;height:2.5in;margin:0 auto;background:#fff;border:1px solid #ddd;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:0.12in;box-sizing:border-box;text-align:center;
+  }
+  .qr-card .table-label{font-size:15pt;font-weight:800;margin-bottom:0.08in;line-height:1.15;word-break:break-word}
+  .qr-card img{width:1.5in;height:1.5in}
+  .qr-card .message{font-size:9pt;margin-top:0.08in;line-height:1.2;word-break:break-word}
+
+  @media print{
+    .toolbar{display:none}
+    body{background:#fff;padding:0}
+    @page{ size:2.5in 2.5in; margin:0; }
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="primary" onclick="window.print()">🖨 Print</button>
+  <a href="{{ url_for('owner.generate_single_qr') }}">+ Generate Another</a>
+</div>
+
+<div class="qr-card">
+  <div class="table-label">{{ table_label }}</div>
+  <img src="/static/images/qr/{{ qr_filename }}" alt="QR code">
+  {% if message %}<div class="message">{{ message }}</div>{% endif %}
+</div>
+</body></html>

@@ -1,0 +1,53 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="card">
+  <form method="GET" style="display:flex;gap:10px;align-items:end">
+    <div>
+      <label>{{ atext.select_date }}</label>
+      <input type="date" name="date" value="{{ selected_date }}" onchange="this.form.submit()">
+    </div>
+  </form>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <a href="{{ url_for('owner.download_report_pdf', scope='day', ref_date=selected_date) }}" class="btn secondary">📄 Day PDF</a>
+    <a href="{{ url_for('owner.download_report_pdf', scope='month', ref_date=selected_date) }}" class="btn secondary">📄 Month PDF</a>
+    <a href="{{ url_for('owner.download_report_pdf', scope='year', ref_date=selected_date) }}" class="btn secondary">📄 Year PDF</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="card stat"><div class="num">{{ orders|length }}</div><div class="lbl">Orders</div></div>
+  <div class="card stat"><div class="num">{{ total_sales|round(0) }}</div><div class="lbl">{{ atext.total }}</div></div>
+  <div class="card stat">
+    <div class="lbl">{{ atext.best_sellers }}</div>
+    {% for name, count in best_sellers %}<div style="font-size:12px">{{ name }} × {{ count }}</div>{% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <table>
+    <tr><th>#</th><th>{{ atext.table }}</th><th>{{ atext.total }}</th><th>{{ atext.status }}</th><th>{{ atext.action }}</th></tr>
+    {% for o in orders %}
+    <tr>
+      <td>{{ o.id }}</td><td>{{ o.table_no }}</td><td>{{ o.total_price }}</td><td>{{ o.status }}</td>
+      <td><a href="{{ url_for('owner.print_order', order_id=o.id) }}" class="btn secondary" style="padding:6px 10px;font-size:11px">{{ atext.print_copy }}</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">{{ atext.no_orders }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Delete Sales Data</h3>
+  <form method="POST" action="{{ url_for('owner.delete_sales_data') }}" onsubmit="return confirm('This cannot be undone. Continue?')">
+    <input type="hidden" name="ref_date" value="{{ selected_date }}">
+    <label>Scope</label>
+    <select name="scope">
+      <option value="day">This day only</option>
+      <option value="month">This whole month</option>
+      <option value="year">This whole year</option>
+    </select>
+    <button type="submit" class="danger" style="margin-top:10px">Delete</button>
+  </form>
+</div>
+{% endblock %}

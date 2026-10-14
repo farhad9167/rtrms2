@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subscription</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:520px">
+  <div class="topbar"><h1>{{ restaurant.name }}</h1><span class="tag">{{ atext.subscription }}</span></div>
+
+  <div class="card">
+    <p>{{ atext.sub_status }}: <span class="badge {{ restaurant.subscription_status }}">{{ restaurant.subscription_status }}</span></p>
+    {% if restaurant.subscription_expiry %}<p>Expires: {{ restaurant.subscription_expiry }}</p>{% endif %}
+  </div>
+
+  {% if submitted %}
+  <div class="msg">✅ Your payment info was submitted. We'll verify it and activate your account shortly.</div>
+  {% else %}
+  <div class="card">
+    <h3 style="margin-top:0">Bank Transfer Details</h3>
+    {% if bank_image and bank_image.value %}
+      <img src="/static/images/bg/{{ bank_image.value }}" style="max-width:100%;border-radius:6px;margin-bottom:10px">
+    {% endif %}
+    {% if bank_text and bank_text.value %}
+      <p style="white-space:pre-line">{{ bank_text.value }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.months_to_pay }}</h3>
+    <p style="color:var(--muted);font-size:12px;margin-top:-6px">Check as many months as you want to pay for now. The amount is fee × months checked.</p>
+    <form method="POST" id="subForm">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:10px 0">
+        {% for idx, label in month_options %}
+        <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-size:12.5px;background:#fffefb;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;margin:0">
+          <input type="checkbox" name="selected_months" value="{{ idx }}" class="month-check" style="width:auto" {{ 'checked' if idx == 1 }}>
+          {{ label }}
+        </label>
+        {% endfor %}
+      </div>
+
+      <label>{{ atext.promo_code }}</label>
+      <input name="promo_code" placeholder="optional">
+
+      <p style="margin-top:14px;font-size:14px">Months selected: <strong id="monthCount">1</strong> &nbsp;|&nbsp;
+        {{ atext.amount_due }}: <strong id="amountDue">{{ country.currency_symbol }}{{ country.monthly_fee }}</strong></p>
+
+      <label>Sender Name</label>
+      <input name="sender_name" required>
+      <label>Sender Account / Phone Number</label>
+      <input name="sender_number" required>
+      <label>Note (optional — transaction ID, date, etc.)</label>
+      <textarea name="note" rows="2"></textarea>
+      <button type="submit" style="margin-top:14px">{{ atext.submit_verification }}</button>
+    </form>
+  </div>
+  <script>
+    const fee = {{ country.monthly_fee }};
+    const sym = "{{ country.currency_symbol }}";
+    document.querySelectorAll('.month-check').forEach(cb => cb.addEventListener('change', updateAmount));
+    function updateAmount(){
+      const count = document.querySelectorAll('.month-check:checked').length;
+      document.getElementById('monthCount').innerText = count;
+      document.getElementById('amountDue').innerText = sym + (fee * count).toLocaleString();
+    }
+  </script>
+  {% endif %}
+
+  <a href="{{ url_for('owner.dashboard') }}" class="btn secondary">{{ atext.back_to_dashboard }}</a>
+</div>
+</body></html>

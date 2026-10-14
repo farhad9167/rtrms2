@@ -1,0 +1,153 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="grid cols-2">
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.branding }}</h3>
+    <form method="POST" enctype="multipart/form-data">
+      <label>{{ atext.bg_image }}</label>
+      <input type="file" name="bg_image">
+
+      <label>{{ atext.signboard_colors }} (pick up to 6)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        {% for hex, cname in palette %}
+        <label style="display:flex;flex-direction:column;align-items:center;text-transform:none;font-size:10px;width:auto">
+          <input type="checkbox" name="colors" value="{{ hex }}" style="width:auto"
+                 {{ 'checked' if hex in current_colors }}>
+          <span style="width:22px;height:22px;border-radius:4px;background:{{ hex }};border:1px solid #555;display:block;margin:2px 0"></span>
+          {{ cname }}
+        </label>
+        {% endfor %}
+      </div>
+
+      <label>{{ atext.popup_text }}</label>
+      <textarea name="popup_text" rows="2">{{ restaurant.popup_text }}</textarea>
+
+      <label>Restaurant Address</label>
+      <textarea name="address" rows="2">{{ restaurant.address or '' }}</textarea>
+
+      <label>Owner Panel Language</label>
+      <select name="panel_language">
+        <option value="en" {{ 'selected' if restaurant.panel_language != 'kr' }}>English</option>
+        <option value="kr" {{ 'selected' if restaurant.panel_language == 'kr' }}>한국어 (Korean)</option>
+      </select>
+      <p style="color:#9a9186;font-size:11.5px;margin-top:4px">Changes dashboard text and Excel/PDF report language after saving.</p>
+
+      <label>Opening Time</label>
+      <input type="time" name="opening_time" value="{{ restaurant.opening_time or '' }}">
+      <label>Closing Time</label>
+      <input type="time" name="closing_time" value="{{ restaurant.closing_time or '' }}">
+      <label>About This Restaurant (shown on the public landing page)</label>
+      <textarea name="about_text" rows="3">{{ restaurant.about_text or '' }}</textarea>
+
+      <label>Owner Profile Picture</label>
+      <input type="file" name="owner_profile_picture" accept="image/*">
+      {% if restaurant.profile_image %}
+      <img src="/static/images/bg/{{ restaurant.profile_image }}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin-top:8px">
+      {% endif %}
+
+      <label>{{ atext.kitchen_printer }}</label>
+      <input name="kitchen_printer" value="{{ restaurant.kitchen_printer or '' }}">
+
+      <label>{{ atext.counter_printer }}</label>
+      <input name="counter_printer" value="{{ restaurant.counter_printer or '' }}">
+
+      <h3>{{ atext.tables_qr }}</h3>
+      <label>{{ atext.table_count }}</label>
+      <input type="number" name="table_count" min="1" value="{{ restaurant.table_count }}">
+
+      <h3>{{ atext.gps_security }}</h3>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none">
+        <input type="checkbox" name="gps_enabled" style="width:auto" {{ 'checked' if restaurant.gps_enabled }}>
+        {{ atext.gps_enable }}
+      </label>
+      <label>Restaurant Latitude</label>
+      <input type="text" name="gps_lat" id="gps_lat" value="{{ restaurant.gps_lat or '' }}">
+      <label>Restaurant Longitude</label>
+      <input type="text" name="gps_lng" id="gps_lng" value="{{ restaurant.gps_lng or '' }}">
+      <button type="button" onclick="useMyLocation()" class="secondary" style="margin-top:6px">📍 Use My Current Location</button>
+      <label>Allowed Radius (meters)</label>
+      <input type="number" name="gps_radius_m" value="{{ restaurant.gps_radius_m }}">
+      <label>{{ atext.qr_expiry }}</label>
+      <input type="number" name="qr_expiry_minutes" value="{{ restaurant.qr_expiry_minutes }}">
+
+      <h3>Billing</h3>
+      <label>Daily Order Serial Reset Time</label>
+      <select name="daily_reset_hour">
+        {% for h in range(24) %}
+        <option value="{{ h }}" {{ 'selected' if restaurant.daily_reset_hour==h }}>{{ '%02d:00'|format(h) }}</option>
+        {% endfor %}
+      </select>
+      <p style="color:#9a9186;font-size:11.5px;margin-top:4px">
+        Order #1 restarts at this local time each day — set it past midnight if you're open late.
+      </p>
+      <label>Bill Footer Message (shown on counter & customer copies)</label>
+      <textarea name="bill_footer_message" rows="2">{{ restaurant.bill_footer_message or '' }}</textarea>
+
+      <h3>In-App Bill Payment</h3>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none">
+        <input type="checkbox" name="bank_payment_enabled" style="width:auto" {{ 'checked' if restaurant.bank_payment_enabled }}>
+        Let customers pay by bank transfer from their phone (off = pay at counter, as before)
+      </label>
+      <label>Bank Name</label>
+      <input name="bank_name" value="{{ restaurant.bank_name or '' }}">
+      <label>Account Holder Name</label>
+      <input name="bank_account_holder" value="{{ restaurant.bank_account_holder or '' }}">
+      <label>Account Number</label>
+      <input name="bank_account_number" value="{{ restaurant.bank_account_number or '' }}">
+
+      <button type="submit" style="margin-top:14px">{{ atext.save_settings }}</button>
+    </form>
+    <a href="{{ url_for('owner.generate_single_qr') }}" class="btn secondary" style="margin-top:10px;display:inline-block">🎫 Generate a Table QR</a>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Username Login</h3>
+    <p style="color:var(--muted);font-size:12px">Set a username + password to log in without Google (Google sign-in still works too, separately).</p>
+    {% if username_error %}<div class="msg" style="border-left-color:#b3462c">{{ username_error }}</div>{% endif %}
+    <form method="POST" action="{{ url_for('owner.update_username') }}">
+      <label>Username (platform-wide unique)</label>
+      <input name="username" value="{{ restaurant.username or '' }}" placeholder="e.g. chickenbar_owner">
+      <label>Password {{ '(leave blank to keep current)' if restaurant.username_password_hash }}</label>
+      <input type="password" name="username_password" placeholder="At least 6 characters">
+      <button type="submit" style="margin-top:10px">Save Username Login</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Your Login Password</h3>
+    <p style="color:var(--muted);font-size:12px">This is required every time you log in on any device, even after Google sign-in — keeps your account safe on shared/unlocked devices.</p>
+    <form method="POST" action="{{ url_for('owner.update_owner_password') }}">
+      <label>New Password</label>
+      <input type="password" name="password" required minlength="6">
+      <button type="submit" style="margin-top:14px">Update Password</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.admin_password }}</h3>
+    <p style="color:#8a8478;font-size:12px">
+      This ID/password is what you give staff so they can log in on their own phone
+      during a power outage or when you're away — usable on many devices at once,
+      with limited access (orders, payment, printing only).
+    </p>
+    <p style="font-size:13px">Staff Login Link:<br>
+      <code style="word-break:break-all">{{ request.url_root }}owner/staff_login/{{ restaurant.slug }}</code>
+    </p>
+    <p style="font-size:13px">Username: <strong>{{ restaurant.admin_username }}</strong></p>
+    <form method="POST" action="{{ url_for('owner.update_admin_password') }}">
+      <label>{{ atext.new_password }}</label>
+      <input type="password" name="password" required>
+      <button type="submit" style="margin-top:14px">{{ atext.update_password }}</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function useMyLocation(){
+  navigator.geolocation.getCurrentPosition(function(pos){
+    document.getElementById('gps_lat').value = pos.coords.latitude;
+    document.getElementById('gps_lng').value = pos.coords.longitude;
+  }, function(err){ alert('Could not get location: ' + err.message); });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Owner Panel{% endblock %} — {{ restaurant.name }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="ownertop">
+  <div class="ownertop-inner">
+    <div class="ownertop-brand">
+      {{ restaurant.name }}
+      <span class="tag" style="font-size:10px">{{ 'VIP' if full_access else 'Staff' }}</span>
+    </div>
+    <div class="ownertop-tabs">
+      <a href="{{ url_for('owner.dashboard') }}" class="{{ 'active' if active=='dashboard' }}">{{ atext.orders }}</a>
+      {% if full_access %}
+      <a href="{{ url_for('owner.menu_manager') }}" class="{{ 'active' if active=='menu' }}">{{ atext.menu }}</a>
+      {% endif %}
+    </div>
+    <div class="ownertop-more">
+      <button class="dots-btn" onclick="toggleMoreMenu(event)" aria-label="More">⋮</button>
+      <div class="dots-menu" id="moreMenu">
+        <a href="{{ url_for('owner.sales_calendar') }}" class="{{ 'active' if active=='calendar' }}">📅 {{ atext.sales_calendar }}</a>
+        <a href="{{ url_for('owner.analytics') }}">📊 Analytics</a>
+        <a href="{{ url_for('owner.download_report') }}">⬇️ {{ atext.report }}</a>
+        {% if full_access %}
+        <div class="dots-divider"></div>
+        <a href="{{ url_for('owner.offers') }}" class="{{ 'active' if active=='offers' }}">🏷️ {{ atext.daily_offers }}</a>
+        <a href="{{ url_for('owner.settings') }}" class="{{ 'active' if active=='settings' }}">⚙️ {{ atext.settings }}</a>
+        <a href="{{ url_for('owner.staff') }}">👥 {{ atext.staff }}</a>
+        <a href="{{ url_for('owner.subscription') }}">💳 {{ atext.subscription }}</a>
+        <a href="{{ url_for('owner.backup_now') }}">💾 Backup</a>
+        <a href="{{ url_for('owner.leave_review') }}">⭐ {{ atext.leave_review }}</a>
+        <a href="#" onclick="document.getElementById('instructionsModal').style.display='flex';closeMoreMenu();return false;">📺 Instructions</a>
+        <div class="dots-divider"></div>
+        {% endif %}
+        <a href="{{ url_for('owner.logout') }}">🚪 {{ atext.logout }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="dots-overlay" id="dotsOverlay" onclick="closeMoreMenu()"></div>
+
+<div class="wrap">
+  {% if full_access %}
+  <div id="instructionsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#211f1a;border-radius:6px;padding:20px;max-width:640px;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0;color:#fff">Setup Instructions</h3>
+        <a href="#" onclick="document.getElementById('instructionsModal').style.display='none';return false;" style="color:#c9852b">✕ Close</a>
+      </div>
+      {% if demo_video_url %}
+        {% set yt_id = demo_video_url.split('v=')[-1].split('/')[-1].split('&')[0] %}
+        <div style="position:relative;padding-bottom:56.25%;height:0">
+          <iframe src="https://www.youtube.com/embed/{{ yt_id }}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen></iframe>
+        </div>
+      {% else %}
+        <p style="color:#8a8478">No setup video has been added yet. Check back soon.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<div id="staffCallBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+     background:#b3462c;color:#fff;padding:14px 18px;display:flex;flex-wrap:wrap;gap:10px;
+     align-items:center;justify-content:center;box-shadow:0 -4px 16px rgba(0,0,0,.3);font-weight:700;font-size:14px">
+</div>
+
+<script>
+function toggleMoreMenu(e){
+  e.stopPropagation();
+  document.getElementById('moreMenu').classList.toggle('open');
+  document.getElementById('dotsOverlay').classList.toggle('open');
+}
+function closeMoreMenu(){
+  document.getElementById('moreMenu').classList.remove('open');
+  document.getElementById('dotsOverlay').classList.remove('open');
+}
+
+// ---------- Call Staff: poll, queue, speak, repeat until dismissed ----------
+let _staffCalls = [];
+let _panelLang = 'en';
+let _audioUnlocked = false;
+let _knownCallIds = new Set();
+
+function pollStaffCalls(){
+  fetch('/owner/api/staff_calls').then(r => r.ok ? r.json() : null).then(data => {
+    if(!data) return;
+    _staffCalls = data.calls || [];
+    _panelLang = data.panel_language || 'en';
+
+    const currentIds = new Set(_staffCalls.map(c => c.id));
+    const brandNew = _staffCalls.filter(c => !_knownCallIds.has(c.id));
+    _knownCallIds = currentIds;
+
+    renderStaffCallBanner();
+    if(brandNew.length > 0){
+      speakCalls(brandNew);   // announce new calls the instant they're seen
+    }
+  }).catch(() => {});
+}
+
+function renderStaffCallBanner(){
+  const el = document.getElementById('staffCallBanner');
+  if(!el) return;
+  if(_staffCalls.length === 0){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'flex';
+  const label = _panelLang === 'kr' ? '🔔 테이블 호출:' : '🔔 Tables calling:';
+  el.innerHTML = label + ' ' + _staffCalls.map(c =>
+    `<span style="background:rgba(255,255,255,.18);padding:6px 12px;border-radius:16px">
+       Table ${c.table_no}
+       <a href="#" onclick="dismissStaffCall(${c.id});return false;" style="color:#fff;margin-left:8px;text-decoration:underline">Dismiss</a>
+     </span>`
+  ).join('');
+}
+
+function dismissStaffCall(id){
+  _knownCallIds.delete(id);
+  fetch('/owner/api/dismiss_call/' + id, {method: 'POST'})
+    .then(() => pollStaffCalls());
+}
+
+function speakCalls(callsToSpeak){
+  if(!_audioUnlocked || callsToSpeak.length === 0) return;
+  if(!('speechSynthesis' in window)) return;
+  const lang = _panelLang === 'kr' ? 'ko-KR' : 'en-US';
+  let i = 0;
+  function speakNext(){
+    if(i >= callsToSpeak.length) return;
+    const call = callsToSpeak[i];
+    const text = _panelLang === 'kr'
+      ? (call.table_no + '번 테이블로 오세요')
+      : ('Please come to table ' + call.table_no);
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lang;
+    utter.onend = function(){ i++; speakNext(); };
+    window.speechSynthesis.speak(utter);
+  }
+  speakNext();
+}
+
+function speakQueuedCalls(){
+  // Periodic reminder for anything still undismissed (new calls are already
+  // announced instantly by pollStaffCalls, so this is just the repeat).
+  speakCalls(_staffCalls);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  pollStaffCalls();
+  setInterval(pollStaffCalls, 2000);
+  setInterval(speakQueuedCalls, 17000);
+
+  // Browsers block audio until the user interacts with the page once.
+  document.addEventListener('click', function unlockAudioOnce(){
+    _audioUnlocked = true;
+    if('speechSynthesis' in window){
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+    }
+    speakQueuedCalls();
+    document.removeEventListener('click', unlockAudioOnce);
+  }, {once: true});
+});
+
+// ---------- Dashboard-only: silently detect a new order and refresh ----------
+if(window.location.pathname.indexOf('/owner/dashboard') !== -1){
+  let _lastOrderId = null;
+  function pollNewOrders(){
+    fetch('/owner/api/latest_order_id').then(r => r.ok ? r.json() : null).then(data => {
+      if(!data) return;
+      if(_lastOrderId === null){ _lastOrderId = data.latest_id; return; }
+      if(data.latest_id > _lastOrderId){ window.location.reload(); }
+    }).catch(() => {});
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    pollNewOrders();
+    setInterval(pollNewOrders, 5000);
+  });
+}
+</script>
+</body></html>

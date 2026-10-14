@@ -1,0 +1,70 @@
+{% extends "superadmin/_base.html" %}
+{% block title %}Feature Control{% endblock %}
+{% block content %}
+<div class="card">
+  <h3 style="margin-top:0">Add / Override a Feature Flag</h3>
+  <p style="color:#8a8478;font-size:12px">
+    A restaurant-level flag overrides a country-level flag, which overrides a global flag.
+    Leave "Active From/Until" blank for a flag that just stays on or off until you change it.
+  </p>
+  <form method="POST">
+    <label>Feature</label>
+    <select name="feature_key">
+      {% for key, label in registry %}
+      <option value="{{ key }}">{{ label }} ({{ key }})</option>
+      {% endfor %}
+    </select>
+    <label>Scope</label>
+    <select name="scope" id="scopeSelect" onchange="toggleScopeValue()">
+      <option value="global">Global (everyone)</option>
+      <option value="country">Country</option>
+      <option value="restaurant">Specific Restaurant</option>
+    </select>
+    <div id="scopeValueWrap" style="display:none">
+      <label>Scope Value</label>
+      <select name="scope_value" id="scopeValueCountry" style="display:none">
+        {% for c in countries %}<option value="{{ c.code }}">{{ c.name }}</option>{% endfor %}
+      </select>
+      <select name="scope_value" id="scopeValueRestaurant" style="display:none">
+        {% for r in restaurants %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;text-transform:none">
+      <input type="checkbox" name="enabled" checked style="width:auto"> Enabled
+    </label>
+    <label>Active From (optional, schedule)</label>
+    <input type="datetime-local" name="active_from">
+    <label>Active Until (optional, schedule)</label>
+    <input type="datetime-local" name="active_until">
+    <button type="submit" style="margin-top:14px">Save Flag</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Current Flags</h3>
+  <table>
+    <tr><th>Feature</th><th>Scope</th><th>Value</th><th>Enabled</th><th>Window</th><th></th></tr>
+    {% for f in flags %}
+    <tr>
+      <td>{{ f.feature_key }}</td><td>{{ f.scope }}</td><td>{{ f.scope_value or '—' }}</td>
+      <td><span class="badge {{ 'active' if f.enabled else 'suspended' }}">{{ 'ON' if f.enabled else 'OFF' }}</span></td>
+      <td style="font-size:11px">{{ f.active_from or '' }} → {{ f.active_until or '' }}</td>
+      <td><a href="{{ url_for('superadmin.delete_flag', flag_id=f.id) }}" class="btn danger" style="padding:4px 8px;font-size:11px">Remove</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<script>
+function toggleScopeValue(){
+  const scope = document.getElementById('scopeSelect').value;
+  const wrap = document.getElementById('scopeValueWrap');
+  const cSel = document.getElementById('scopeValueCountry');
+  const rSel = document.getElementById('scopeValueRestaurant');
+  wrap.style.display = scope === 'global' ? 'none' : 'block';
+  cSel.style.display = scope === 'country' ? 'block' : 'none';
+  rSel.style.display = scope === 'restaurant' ? 'block' : 'none';
+  cSel.disabled = scope !== 'country';
+  rSel.disabled = scope !== 'restaurant';
+}
+</script>
+{% endblock %}

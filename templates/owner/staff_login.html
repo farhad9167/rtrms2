@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Login — {{ restaurant.name }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:360px">
+  <div class="topbar"><h1>{{ restaurant.name }}</h1><span class="tag">Staff Login</span></div>
+  <div class="card">
+    <p style="color:#8a8478;font-size:12px">
+      For temporary use by restaurant staff (e.g. during a power outage) — limited to taking orders,
+      marking payments, and printing. Ask the owner for the ID and password.
+    </p>
+    {% if error %}<div class="msg" style="border-left-color:#b3462c">{{ error }}</div>{% endif %}
+    <form method="POST">
+      <label>Username</label>
+      <input name="username" required>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit" style="margin-top:14px;width:100%">Login</button>
+    </form>
+  </div>
+</div>
+</body></html>

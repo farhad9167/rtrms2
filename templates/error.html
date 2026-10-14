@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ code }} — Something went wrong</title>
+<style>
+  body{
+    margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:#FDFBF7;color:#333333;font-family:'Segoe UI',sans-serif;text-align:center;padding:20px;
+  }
+  .box{max-width:360px}
+  .code{font-size:52px;font-weight:800;color:#E2725B;margin:0}
+  p{color:#9a9186;font-size:14px}
+  a{display:inline-block;margin-top:14px;background:#E2725B;color:#fff;padding:10px 22px;
+    border-radius:22px;text-decoration:none;font-weight:700;font-size:13px}
+</style>
+</head>
+<body>
+<div class="box">
+  <p class="code">{{ code }}</p>
+  <p>{{ message }}</p>
+  <a href="/">Go to homepage</a>
+</div>
+</body></html>

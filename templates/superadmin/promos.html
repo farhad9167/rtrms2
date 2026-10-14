@@ -1,0 +1,37 @@
+{% extends "superadmin/_base.html" %}
+{% block title %}Promo Codes{% endblock %}
+{% block content %}
+<div class="card">
+  <h3 style="margin-top:0">Create Promo Code</h3>
+  <form method="POST">
+    <label>Code</label>
+    <input name="code" placeholder="e.g. BULK12" required>
+    <label>Discount %</label>
+    <input type="number" name="discount_percent" min="1" max="90" required>
+    <label>Minimum Months (to qualify)</label>
+    <input type="number" name="min_months" value="1">
+    <label>Restrict to Country (optional)</label>
+    <select name="country_code">
+      <option value="">All countries</option>
+      {% for c in countries %}<option value="{{ c.code }}">{{ c.name }}</option>{% endfor %}
+    </select>
+    <label>Expires At (optional)</label>
+    <input type="datetime-local" name="expires_at">
+    <button type="submit" style="margin-top:14px">Create</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <tr><th>Code</th><th>Discount</th><th>Min Months</th><th>Country</th><th>Status</th><th></th></tr>
+    {% for p in promo_list %}
+    <tr>
+      <td>{{ p.code }}</td><td>{{ p.discount_percent }}%</td><td>{{ p.min_months }}</td>
+      <td>{{ p.country_code or 'All' }}</td>
+      <td><span class="badge {{ 'active' if p.active else 'suspended' }}">{{ 'Active' if p.active else 'Off' }}</span></td>
+      <td><a href="{{ url_for('superadmin.toggle_promo', promo_id=p.id) }}" class="btn secondary" style="padding:4px 8px;font-size:11px">Toggle</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

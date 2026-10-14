@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in with Username</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:360px">
+  <div class="topbar"><h1>Sign in with Username</h1></div>
+  <div class="card">
+    {% if error %}<div class="msg" style="border-left-color:#b3462c">{{ error }}</div>{% endif %}
+    <form method="POST">
+      <label>Username</label>
+      <input name="username" required>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit" style="margin-top:14px;width:100%">Login</button>
+    </form>
+  </div>
+  <a href="{{ url_for('owner.login') }}" class="btn secondary" style="width:100%;text-align:center;display:block">← Back</a>
+</div>
+</body></html>

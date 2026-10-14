@@ -1,0 +1,17 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="card" style="max-width:480px">
+  <h3 style="margin-top:0">🎫 Generate a Table QR</h3>
+  <p style="color:#9a9186;font-size:12.5px">
+    Type the table name and a message in any language — a printable QR card
+    is generated fresh each time (nothing is saved, so change it however you like).
+  </p>
+  <form method="POST">
+    <label>Table Label</label>
+    <input name="table_label" placeholder="e.g. Table 7 / 테이블 7 / টেবিল ৭" required>
+    <label>Message (shown under the QR)</label>
+    <input name="message" placeholder="e.g. Scan for Menu / 메뉴를 스캔하세요">
+    <button type="submit" style="margin-top:14px">Generate QR</button>
+  </form>
+</div>
+{% endblock %}

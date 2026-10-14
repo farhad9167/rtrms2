@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set Up Your Restaurant</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:480px">
+  <div class="topbar"><h1>Welcome</h1><span class="tag">Step 1 of 1</span></div>
+  <div class="card">
+    <p>Let's set up your restaurant profile.</p>
+    <form method="POST">
+      <label>Restaurant Name</label>
+      <input name="restaurant_name" required>
+
+      <label>Country</label>
+      <select name="country_code" id="countrySelect" required {{ 'disabled' if lock_active }}>
+        {% for c in countries %}
+        <option value="{{ c.code }}" data-name="{{ c.name }}">{{ c.name }} ({{ c.lang_primary }}/{{ c.lang_secondary }})</option>
+        {% endfor %}
+      </select>
+      {% if lock_active %}
+      <input type="hidden" name="country_code" id="countryHidden">
+      <p id="detectMsg" style="color:#8a8478;font-size:12px;margin-top:6px">Detecting your country automatically…</p>
+      {% endif %}
+
+      <label>Referral Code (optional)</label>
+      <input name="referral_code" placeholder="If another owner referred you">
+
+      <label>Restaurant Address</label>
+      <textarea name="address" rows="2" placeholder="Street, city, etc."></textarea>
+
+      <label>Owner Panel Language</label>
+      <select name="panel_language" required>
+        <option value="en">English</option>
+        <option value="kr">한국어 (Korean)</option>
+      </select>
+      <p style="color:#8a8478;font-size:12px;margin-top:4px">
+        Your dashboard, buttons, and sales reports will all be in this language.
+        You can change it later in Settings.
+      </p>
+
+      <p style="color:#8a8478;font-size:12px;margin-top:14px">
+        Your menu language and prices will follow the country shown above. Monthly fees are shown after your account is created.
+      </p>
+      <button type="submit" style="margin-top:14px">Continue to Subscription</button>
+    </form>
+  </div>
+</div>
+
+{% if lock_active %}
+<script>
+// IP-based country auto-detect. Falls back silently to whatever the dropdown
+// already shows (its first option) if the lookup fails or the user is offline —
+// the super-admin can turn this lock off platform-wide if it ever misfires often.
+fetch('https://ipapi.co/json/').then(r => r.json()).then(data => {
+  const cc = (data.country_code || '').toUpperCase();
+  const select = document.getElementById('countrySelect');
+  let matched = false;
+  for (const opt of select.options) {
+    if (opt.value === cc) { select.value = cc; matched = true; break; }
+  }
+  document.getElementById('countryHidden').value = select.value;
+  document.getElementById('detectMsg').innerText = matched
+    ? ('Detected: ' + select.options[select.selectedIndex].dataset.name)
+    : 'Could not auto-detect — defaulted to ' + select.options[select.selectedIndex].dataset.name;
+}).catch(() => {
+  const select = document.getElementById('countrySelect');
+  document.getElementById('countryHidden').value = select.value;
+  document.getElementById('detectMsg').innerText = 'Auto-detect unavailable — defaulted to ' + select.options[select.selectedIndex].dataset.name;
+});
+</script>
+{% endif %}
+</body></html>

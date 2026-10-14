@@ -1,0 +1,16 @@
+{% extends "superadmin/_base.html" %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+<div class="card">
+  <table>
+    <tr><th>Restaurant</th><th>Rating</th><th>Review</th><th>Date</th><th></th></tr>
+    {% for rv in review_list %}
+    <tr>
+      <td>{{ rv.restaurant_id }}</td><td>{{ '★'*rv.rating }}</td><td>{{ rv.review_text }}</td>
+      <td style="font-size:11px">{{ rv.created_at.strftime('%Y-%m-%d') }}</td>
+      <td><a href="{{ url_for('superadmin.delete_review', review_id=rv.id) }}" class="btn danger" style="padding:4px 8px;font-size:11px">Remove</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

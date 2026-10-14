@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Super Admin{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="drawer-topbar">
+  <button class="hamburger-btn" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="drawer-topbar-title">Platform Control</div>
+  <span class="tag" style="font-size:10px">VIP</span>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer-menu" id="drawerMenu">
+  <div class="drawer-header">
+    <div class="drawer-brand">Sellovate AI</div>
+    <div class="drawer-sub">Super Admin</div>
+  </div>
+  <a href="{{ url_for('superadmin.dashboard') }}" class="{{ 'active' if active=='dashboard' }}">🏠 Dashboard</a>
+  <a href="{{ url_for('superadmin.features') }}" class="{{ 'active' if active=='features' }}">🎛️ Feature Control</a>
+  <a href="{{ url_for('superadmin.promos') }}" class="{{ 'active' if active=='promos' }}">🏷️ Promo Codes</a>
+  <a href="{{ url_for('superadmin.reviews') }}" class="{{ 'active' if active=='reviews' }}">⭐ Reviews</a>
+  <a href="{{ url_for('superadmin.settings') }}" class="{{ 'active' if active=='settings' }}">⚙️ Platform Settings</a>
+  <div class="drawer-divider"></div>
+  <a href="{{ url_for('public.landing') }}" target="_blank">🌐 View Public Site ↗</a>
+  <a href="{{ url_for('superadmin.logout') }}">🚪 Logout</a>
+</nav>
+
+<div class="wrap">
+  {% block content %}{% endblock %}
+</div>
+
+<script>
+function toggleDrawer(){
+  document.getElementById('drawerMenu').classList.toggle('open');
+  document.getElementById('drawerOverlay').classList.toggle('open');
+}
+function closeDrawer(){
+  document.getElementById('drawerMenu').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+</script>
+</body></html>

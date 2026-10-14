@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ settings.get('platform_name','Sellovate AI') }} — Restaurants on our platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  body{font-family:'Inter',sans-serif;background:#faf7f2}
+  .fp-nav{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 24px;
+    background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:20;
+  }
+  .fp-nav .brand{font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:#2c2a22}
+  .fp-nav .cta{
+    background:#2c2a22;color:#fff;padding:10px 20px;border-radius:22px;font-size:12.5px;
+    font-weight:700;text-decoration:none;letter-spacing:.02em;
+  }
+  .fp-nav .cta:hover{background:#5c6d5e}
+  .fp-card{cursor:pointer}
+  .fp-card-link{color:inherit;text-decoration:none;display:block}
+  .fp-hero{
+    background:#eae4d8;padding:60px 24px;text-align:center;
+  }
+  .fp-hero .lede{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#5c5646;margin-bottom:4px}
+  .fp-hero h1{font-family:'Playfair Display',serif;font-weight:700;font-size:52px;margin:0;color:#2c2a22;letter-spacing:.01em}
+  .fp-hero p{color:#6b6656;font-size:14px;margin-top:14px}
+
+  .fp-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:26px 16px 4px}
+  .fp-tabs a{padding:7px 15px;border-radius:16px;border:1px solid #ddd5c4;font-size:12.5px;color:#5c5646;background:#fff}
+  .fp-tabs a.active{background:#5c6d5e;color:#fff;border-color:#5c6d5e}
+
+  .fp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1100px;margin:0 auto;padding:30px 20px}
+  @media (max-width:860px){ .fp-grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .fp-grid{grid-template-columns:1fr} }
+
+  .fp-card{background:#fff;border-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:transform .25s ease, box-shadow .25s ease}
+  .fp-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(0,0,0,.1)}
+  .fp-card .photo{width:100%;height:200px;background:#5c6d5e;position:relative;overflow:hidden}
+  .fp-card .photo img{width:100%;height:100%;object-fit:cover}
+  .fp-card .photo .initial{
+    width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;font-size:56px;color:rgba(255,255,255,.85);
+  }
+  .fp-card .body{padding:18px 20px 22px}
+  .fp-card .name{font-family:'Playfair Display',serif;font-weight:700;font-size:19px;color:#2c2a22;margin:0 0 6px}
+  .fp-card .meta{font-size:11.5px;color:#8a8474;margin-bottom:2px}
+  .fp-card .about{font-size:12.5px;color:#5c5646;margin-top:10px;line-height:1.5}
+  .fp-card .rating{color:#c9852b;font-size:12px;margin-top:8px}
+  .fp-card .joined{font-size:10.5px;color:#a39d8c;margin-top:8px;text-transform:uppercase;letter-spacing:.04em}
+
+  .fp-seeall{text-align:center;padding:10px 20px 60px}
+  .fp-seeall a{
+    display:inline-block;border:1.5px solid #2c2a22;color:#2c2a22;padding:12px 34px;
+    font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;
+  }
+  .fp-seeall a:hover{background:#2c2a22;color:#fff}
+  .fp-empty{grid-column:1/-1;text-align:center;color:#8a8474;padding:40px 0}
+
+  /* ---------- Sales stats ---------- */
+  .fp-stats-wrap{max-width:1100px;margin:0 auto;padding:0 20px 10px}
+  .fp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:10px}
+  .fp-stat-card{
+    background:linear-gradient(135deg,#5c6d5e,#2c2a22);color:#fff;border-radius:10px;
+    padding:20px;text-align:center;
+  }
+  .fp-stat-card .amount{font-family:'Playfair Display',serif;font-size:26px;font-weight:700}
+  .fp-stat-card .label{font-size:11.5px;opacity:.85;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+
+  /* ---------- Marketing / how it works ---------- */
+  .fp-marketing{max-width:1100px;margin:0 auto;padding:40px 20px 10px}
+  .fp-marketing h2{font-family:'Playfair Display',serif;text-align:center;font-size:26px;margin-bottom:6px}
+  .fp-marketing .sub{text-align:center;color:#8a8474;font-size:13.5px;margin-bottom:28px}
+  .fp-status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .fp-status-card{border-radius:10px;padding:20px;color:#fff}
+  .fp-status-card .icon{font-size:26px;margin-bottom:8px}
+  .fp-status-card h4{margin:0 0 6px;font-size:15px}
+  .fp-status-card p{margin:0;font-size:12.5px;opacity:.92;line-height:1.5}
+  .c1{background:#b3462c}
+  .c2{background:#c9852b}
+  .c3{background:#5c6d5e}
+  .c4{background:#2c2a22}
+  .c5{background:#7b6f9e}
+  .c6{background:#2b6f7a}
+</style>
+</head>
+<body>
+
+<div class="fp-nav">
+  <a href="{{ url_for('public.landing') }}" class="brand">{{ settings.get('platform_name','Sellovate AI') }}</a>
+  <a href="{{ url_for('owner.login') }}" class="cta">🚀 List Your Restaurant</a>
+</div>
+
+<div class="fp-hero">
+  <div class="lede">the</div>
+  <h1>Restaurants</h1>
+  <p>{{ settings.get('platform_name','Sellovate AI') }} — every restaurant running live on our platform</p>
+</div>
+
+{% if country_sales %}
+<div class="fp-stats-wrap">
+  <div class="fp-stats">
+    {% for s in country_sales %}
+    <div class="fp-stat-card">
+      <div class="amount">{{ s.currency_symbol }}{{ '{:,.0f}'.format(s.total_amount) }}</div>
+      <div class="label">Total sales in {{ s.name }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="fp-marketing">
+  <h2>How Sellovate AI Works</h2>
+  <div class="sub">From a paper menu to a fully digital restaurant, in one afternoon.</div>
+  <div class="fp-status-grid">
+    <div class="fp-status-card c1">
+      <div class="icon">📋</div>
+      <h4>Before</h4>
+      <p>Paper menus, handwritten orders, mistakes in the kitchen, no real sales data.</p>
+    </div>
+    <div class="fp-status-card c3">
+      <div class="icon">📱</div>
+      <h4>Set Up</h4>
+      <p>Sign in with Google, add your menu, print your table QR codes. No app for customers to install.</p>
+    </div>
+    <div class="fp-status-card c2">
+      <div class="icon">🧾</div>
+      <h4>Order & Print</h4>
+      <p>Customers scan, order from their phone, and the ticket prints straight to your kitchen.</p>
+    </div>
+    <div class="fp-status-card c4">
+      <div class="icon">📊</div>
+      <h4>After</h4>
+      <p>Fewer mistakes, faster table turnover, and real daily/monthly sales reports.</p>
+    </div>
+    <div class="fp-status-card c5">
+      <div class="icon">🔔</div>
+      <h4>Call Staff, Instantly</h4>
+      <p>Customers tap one button — your staff hears it announced out loud, table number and all.</p>
+    </div>
+    <div class="fp-status-card c6">
+      <div class="icon">🌍</div>
+      <h4>Any Language, Any Currency</h4>
+      <p>Menus and dashboards in your own language — Korean, Bengali, English, and more.</p>
+    </div>
+  </div>
+</div>
+
+<div class="fp-tabs">
+  <a href="{{ url_for('public.landing') }}" class="{{ 'active' if not selected_country }}">All</a>
+  {% for c in countries %}
+  <a href="{{ url_for('public.landing', country=c.code) }}{{ '&all=1' if show_all }}" class="{{ 'active' if selected_country==c.code }}">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="fp-grid">
+  {% for r in restaurants %}
+  <a href="{{ url_for('public.restaurant_preview', slug=r.slug) }}" class="fp-card-link">
+  <div class="fp-card">
+    <div class="photo">
+      {% if r.profile_image %}
+      <img src="/static/images/bg/{{ r.profile_image }}" alt="{{ r.name }}">
+      {% else %}
+      <div class="initial">{{ r.name[0] }}</div>
+      {% endif %}
+    </div>
+    <div class="body">
+      <div class="name">{{ r.name }}</div>
+      {% if r.address %}<div class="meta">📍 {{ r.address }}</div>{% endif %}
+      {% if r.opening_time and r.closing_time %}<div class="meta">🕐 {{ r.opening_time }} – {{ r.closing_time }}</div>{% endif %}
+      {% if r.avg_rating %}<div class="rating">⭐ {{ r.avg_rating }} ({{ r.review_count }})</div>{% endif %}
+      {% if r.about_text %}<div class="about">{{ r.about_text }}</div>{% endif %}
+      <div class="joined">Joined {{ r.joined_date.strftime('%B %Y') }}</div>
+    </div>
+  </div>
+  </a>
+  {% else %}
+  <div class="fp-empty">No restaurants are live yet.</div>
+  {% endfor %}
+</div>
+
+{% if not show_all and total_active > 6 %}
+<div class="fp-seeall">
+  <a href="{{ url_for('public.landing', all=1, country=selected_country) }}">See All {{ total_active }} Restaurants</a>
+</div>
+{% endif %}
+
+</body></html>

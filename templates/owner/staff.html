@@ -1,0 +1,31 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="grid cols-2">
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.add_staff }}</h3>
+    <form method="POST">
+      <label>{{ atext.staff_name }}</label>
+      <input name="name" required>
+      <label>{{ atext.staff_username }}</label>
+      <input name="username" required>
+      <label>{{ atext.staff_password }}</label>
+      <input type="password" name="password" required>
+      <label>{{ atext.staff_role }}</label>
+      <select name="role">
+        <option value="waiter">Waiter (orders only)</option>
+        <option value="manager">Manager (orders + menu + settings)</option>
+      </select>
+      <button type="submit" style="margin-top:14px">{{ atext.add_staff }}</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.staff }}</h3>
+    <table>
+      <tr><th>{{ atext.staff_name }}</th><th>{{ atext.staff_username }}</th><th>{{ atext.staff_role }}</th></tr>
+      {% for s in staff_list %}
+      <tr><td>{{ s.name }}</td><td>{{ s.username }}</td><td>{{ s.role }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

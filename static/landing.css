@@ -1,0 +1,154 @@
+/* ---------- Design tokens (blue/purple SaaS look, landing page only) ---------- */
+:root{
+  --lp-primary:#2563EB; --lp-primary-dark:#1D4ED8; --lp-primary-fg:#F8FAFC;
+  --lp-secondary:#7C3AED; --lp-secondary-dark:#6D28D9;
+  --lp-accent:#06B6D4;
+  --lp-success:#22C55E; --lp-warning:#F59E0B; --lp-danger:#EF4444;
+  --lp-bg:#F8FAFC; --lp-ink:#0F172A; --lp-muted:#64748B; --lp-border:#E2E8F0;
+  --lp-card:#FFFFFF;
+  --lp-radius:0.75rem;
+  --lp-glow:0 0 0 1px rgba(37,99,235,0.08), 0 8px 30px -8px rgba(37,99,235,0.25);
+  --lp-card-shadow:0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -8px rgba(15,23,42,0.08);
+  --lp-card-shadow-hover:0 4px 12px rgba(15,23,42,0.06), 0 20px 40px -16px rgba(37,99,235,0.18);
+  --lp-gradient-brand:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);
+}
+
+.lp *{box-sizing:border-box}
+.lp{
+  background:var(--lp-bg); color:var(--lp-ink);
+  font-family:'Inter',-apple-system,'Segoe UI',sans-serif;
+  font-feature-settings:"cv11","ss01";
+  scroll-behavior:smooth;
+}
+.lp ::selection{background-color:rgba(37,99,235,0.2)}
+.lp a{color:var(--lp-primary);text-decoration:none}
+.lp *:focus-visible{outline:2px solid #2563eb;outline-offset:2px;border-radius:4px}
+
+.lp-container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- Hero ---------- */
+.lp-hero{
+  position:relative;overflow:hidden;padding:72px 24px 56px;text-align:center;
+  background-image:
+    linear-gradient(to right, rgba(15,23,42,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px);
+  background-size:32px 32px;
+}
+.lp-hero::before{
+  content:"";position:absolute;top:-100px;left:50%;transform:translateX(-50%);
+  width:600px;height:400px;pointer-events:none;
+  background:radial-gradient(600px circle at 50% 0%, rgba(37,99,235,0.15), transparent 70%);
+}
+.lp-badge{
+  display:inline-block;background:var(--lp-card);border:1px solid var(--lp-border);
+  border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--lp-primary);
+  box-shadow:var(--lp-card-shadow);margin-bottom:20px;position:relative;
+}
+.lp-hero h1{
+  font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.15;margin:0 0 16px;
+  position:relative;
+}
+.lp-gradient-text{
+  background:var(--lp-gradient-brand);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lp-hero p{
+  max-width:560px;margin:0 auto 28px;color:var(--lp-muted);font-size:15px;line-height:1.6;
+  position:relative;
+}
+.lp-cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+
+.lp-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;
+  font-weight:700;font-size:14px;border:none;cursor:pointer;text-decoration:none;
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease;
+}
+.lp-btn-primary{
+  background:var(--lp-gradient-brand);color:#fff;box-shadow:var(--lp-glow);
+}
+.lp-btn-primary:hover{filter:brightness(1.1);transform:translateY(-2px)}
+.lp-btn-primary:active{transform:translateY(0)}
+.lp-btn-outline{
+  background:var(--lp-card);color:var(--lp-ink);border:1px solid var(--lp-border);box-shadow:var(--lp-card-shadow);
+}
+.lp-btn-outline:hover{transform:translateY(-2px);box-shadow:var(--lp-card-shadow-hover)}
+.lp-btn-outline:active{transform:translateY(0)}
+
+/* ---------- Floating decorative badge ---------- */
+.lp-float{animation:lp-float 6s ease-in-out infinite}
+@keyframes lp-float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-8px)}}
+
+/* ---------- Section + nav ---------- */
+.lp-nav{
+  display:flex;justify-content:space-between;align-items:center;padding:16px 24px;
+  border-bottom:1px solid var(--lp-border);background:rgba(248,250,252,.85);
+  backdrop-filter:blur(10px);position:sticky;top:0;z-index:40;
+}
+.lp-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px;color:var(--lp-ink)}
+.lp-logo-mark{
+  width:30px;height:30px;border-radius:9px;background:var(--lp-gradient-brand);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;
+}
+.lp-nav-links{display:flex;gap:18px;font-size:13.5px;font-weight:600;color:var(--lp-muted)}
+.lp-nav-links a{color:var(--lp-muted)}
+.lp-nav-links a:hover{color:var(--lp-primary)}
+
+.lp-section{padding:56px 24px}
+.lp-section h2{font-size:26px;font-weight:800;text-align:center;margin:0 0 10px}
+.lp-section .lp-subhead{text-align:center;color:var(--lp-muted);font-size:14px;max-width:480px;margin:0 auto 36px}
+
+/* ---------- Cards / grid, scroll-in items ---------- */
+.lp-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.lp-card{
+  background:var(--lp-card);border:1px solid var(--lp-border);border-radius:var(--lp-radius);
+  padding:22px;box-shadow:var(--lp-card-shadow);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.lp-card:hover{transform:translateY(-4px);box-shadow:var(--lp-card-shadow-hover)}
+.lp-icon-box{
+  width:42px;height:42px;border-radius:12px;background:rgba(37,99,235,.1);color:var(--lp-primary);
+  display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;
+  transition:background .18s ease, color .18s ease;
+}
+.lp-card:hover .lp-icon-box{background:var(--lp-primary);color:#fff}
+.lp-card h3{font-size:15.5px;font-weight:700;margin:0 0 6px}
+.lp-card p{font-size:13px;color:var(--lp-muted);margin:0;line-height:1.55}
+
+/* Scroll-triggered fade-up (JS toggles .lp-in) */
+.lp-fade-up{opacity:0;transform:translateY(20px);transition:opacity .5s ease, transform .5s ease}
+.lp-fade-up.lp-in{opacity:1;transform:translateY(0)}
+
+/* ---------- Glass panel (used sparingly) ---------- */
+.lp-glass{
+  background:rgba(255,255,255,.6);backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid rgba(255,255,255,.4);border-radius:var(--lp-radius);
+}
+
+/* ---------- Footer ---------- */
+.lp-footer{border-top:1px solid var(--lp-border);padding:32px 24px;text-align:center}
+.lp-footer-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:12.5px;color:var(--lp-muted);margin-bottom:10px}
+.lp-footer-links a{color:var(--lp-muted)}
+.lp-footer-links a:hover{color:var(--lp-primary)}
+.lp-footer .lp-copy{font-size:11.5px;color:#94A3B8}
+
+/* ---------- Restaurant cards on landing (re-themed) ---------- */
+.lp-rcard{position:relative}
+.lp-rcard .lp-rname{font-size:15.5px;font-weight:800;margin:0 0 4px}
+.lp-rcard .lp-rmeta{font-size:11.5px;color:var(--lp-muted);margin-bottom:6px}
+.lp-rcard .lp-rrating{color:var(--lp-primary);font-weight:700;font-size:13px;margin-bottom:8px}
+.lp-rcard .lp-rreview{
+  font-size:12px;background:#F1F5F9;border-left:3px solid var(--lp-primary);
+  padding:8px 10px;border-radius:0 8px 8px 0;margin:6px 0;color:var(--lp-ink);
+}
+.lp-country-pill{
+  padding:7px 14px;border-radius:999px;border:1px solid var(--lp-border);background:var(--lp-card);
+  font-size:12.5px;font-weight:600;color:var(--lp-ink);transition:all .18s ease;
+}
+.lp-country-pill.active,.lp-country-pill:hover{background:var(--lp-primary);color:#fff;border-color:var(--lp-primary)}
+.lp-country-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+
+@media (prefers-reduced-motion: reduce){
+  .lp *, .lp *::before, .lp *::after{
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important;
+  }
+}

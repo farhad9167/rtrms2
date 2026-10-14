@@ -1,0 +1,14 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="card">
+  <h3 style="margin-top:0">Sales — Last 30 Days With Orders</h3>
+  <table>
+    <tr><th>Date</th><th>{{ atext.total }}</th></tr>
+    {% for d, total in sorted_days %}
+    <tr><td>{{ d }}</td><td>{{ total|round(0) }}</td></tr>
+    {% else %}
+    <tr><td colspan="2">No data yet.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

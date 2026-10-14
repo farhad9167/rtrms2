@@ -1,0 +1,83 @@
+# RTRMS split into 3 services + 1 nginx gateway.
+# One codebase / one image; SERVICE_ROLE decides which routes each container answers.
+
+x-rtrms: &rtrms
+  build: .
+  image: rtrms:latest
+  restart: unless-stopped
+  env_file:
+    - .env
+  volumes:
+    - rtrms_data:/data                              # shared SQLite DB + app.log
+    - rtrms_food:/app/static/images/food            # uploaded food photos
+    - rtrms_food_hd:/app/static/images/food_hd
+    - rtrms_qr:/app/static/images/qr                # generated QR codes
+    - rtrms_bg:/app/static/images/bg
+    - rtrms_backups:/app/backups
+
+services:
+  web:                      # public site + customer QR menu / ordering
+    <<: *rtrms
+    container_name: rtrms-web
+    environment:
+      DATA_DIR: /data
+      SERVICE_ROLE: web
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  owner:                    # restaurant owner / staff dashboard (/owner/...)
+    <<: *rtrms
+    container_name: rtrms-owner
+    environment:
+      DATA_DIR: /data
+      SERVICE_ROLE: owner
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  superadmin:               # platform admin (/superadmin/...)
+    <<: *rtrms
+    container_name: rtrms-superadmin
+    environment:
+      DATA_DIR: /data
+      SERVICE_ROLE: superadmin
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  gateway:                  # the only thing exposed to your PC / network
+    image: nginx:1.27-alpine
+    container_name: rtrms-gateway
+    restart: unless-stopped
+    ports:
+      - "5000:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+      - owner
+      - superadmin
+
+volumes:
+  rtrms_data:
+  rtrms_food:
+  rtrms_food_hd:
+  rtrms_qr:
+  rtrms_bg:
+  rtrms_backups:

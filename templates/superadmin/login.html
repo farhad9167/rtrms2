@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Admin Login</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap" style="max-width:360px">
+  <div class="topbar"><h1>Platform Control</h1></div>
+  <div class="card">
+    <form method="POST">
+      <label>Username</label>
+      <input name="username" required>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit" style="margin-top:14px;width:100%">Login</button>
+    </form>
+    <p style="text-align:center;margin-top:14px;font-size:12px">
+      <a href="{{ url_for('superadmin.reset_password_request') }}">Forgot password? Reset via Google</a>
+    </p>
+  </div>
+</div>
+</body></html>

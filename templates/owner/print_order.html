@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order #{{ order.id }}</title>
+<style>
+  body{font-family:'Courier New',monospace;max-width:320px;margin:20px auto;color:#000}
+  h2{text-align:center;margin:0 0 4px}
+  .center{text-align:center}
+  .line{border-top:1px dashed #000;margin:8px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  td{padding:2px 0}
+  .no-print{margin-top:20px;text-align:center}
+  @media print{
+    .no-print{display:none}
+    /* Matches an 80mm thermal roll (POS-80C etc). Change to 58mm if your
+       printer uses the narrower roll — most drivers also need the paper
+       size set to match under Printer Properties > Printing Preferences. */
+    @page{ size:80mm auto; margin:2mm; }
+    body{ max-width:76mm; margin:0; }
+  }
+</style>
+</head>
+<body>
+  <h2>{{ restaurant.name }}</h2>
+  <div class="center">Order #{{ order.id }}{% if order.daily_serial %} · Serial #{{ order.daily_serial }}{% endif %} — Table {{ order.table_no }}</div>
+  <div class="center">{{ order.local_dt.strftime('%Y-%m-%d %H:%M') }}</div>
+  <div class="line"></div>
+  <table>
+    {% for it in order.food_list %}
+    <tr><td>{{ it.count }} x {{ it.name }}</td><td style="text-align:right">{{ (it.price*it.count)|round(2) }}</td></tr>
+    {% endfor %}
+  </table>
+  <div class="line"></div>
+  <table>
+    <tr><td><strong>TOTAL</strong></td><td style="text-align:right"><strong>{{ country.currency_symbol }}{{ order.total_price }}</strong></td></tr>
+    <tr><td>Payment</td><td style="text-align:right">{{ order.payment_method }}</td></tr>
+    <tr><td>Status</td><td style="text-align:right">{{ order.status }}</td></tr>
+  </table>
+  {% if restaurant.bill_footer_message %}
+  <div class="line"></div>
+  <div class="center" style="font-size:12px">{{ restaurant.bill_footer_message }}</div>
+  {% endif %}
+  <div class="no-print">
+    <button onclick="window.print()">🖨 Print / Save as PDF</button>
+  </div>
+</body></html>

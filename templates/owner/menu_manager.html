@@ -1,0 +1,95 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="grid cols-2">
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.add_category }}</h3>
+    <form method="POST" action="{{ url_for('owner.category_add') }}">
+      <label>{{ atext.name_primary }}</label>
+      <input name="name_primary" required>
+      <label>{{ atext.name_en }}</label>
+      <input name="name_secondary" required>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;margin-top:10px">
+        <input type="checkbox" name="multi_portion_enabled" style="width:auto">
+        Enable multi-portion pricing (e.g. Small/Medium/Large for shareable dishes)
+      </label>
+      <button type="submit" style="margin-top:14px">{{ atext.add_category }}</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">{{ atext.add_item }}</h3>
+    <form method="POST" enctype="multipart/form-data">
+      <label>{{ atext.category }}</label>
+      <select name="category_id" required>
+        {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name_primary }} / {{ c.name_secondary }}{{ ' — multi-portion' if c.multi_portion_enabled }}</option>
+        {% endfor %}
+      </select>
+      <label>{{ atext.name_primary }}</label>
+      <input name="name_primary" required>
+      <label>{{ atext.name_en }}</label>
+      <input name="name_secondary" required>
+      <label>{{ atext.price }} (leave 0 if you'll add size tiers below after creating the item)</label>
+      <input type="number" step="0.01" name="price" value="0">
+      <label>{{ atext.image }} (full HD OK — auto-optimized for fast menu loading)</label>
+      <input type="file" name="image">
+      <button type="submit" style="margin-top:14px">{{ atext.add }}</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">{{ atext.current_menu }}</h3>
+  <p style="color:#9a9186;font-size:12px">
+    Categories with multi-portion pricing on:
+    {% for c in categories if c.multi_portion_enabled %}
+    <a href="{{ url_for('owner.toggle_multi_portion', category_id=c.id) }}" class="badge active" style="text-decoration:none;margin-right:4px">{{ c.name_primary }} (turn off)</a>
+    {% else %}none{% endfor %}
+    &nbsp;|&nbsp; Off:
+    {% for c in categories if not c.multi_portion_enabled %}
+    <a href="{{ url_for('owner.toggle_multi_portion', category_id=c.id) }}" class="badge pending" style="text-decoration:none;margin-right:4px">{{ c.name_primary }} (turn on)</a>
+    {% endfor %}
+  </p>
+
+  {% for i in items %}
+  {% set cat = categories | selectattr('id', 'equalto', i.category_id) | first %}
+  <div class="card" style="background:#fbf6ee;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>{{ i.name_primary }} / {{ i.name_secondary }}</strong>
+      <div style="display:flex;gap:8px;align-items:center">
+        {% if out_of_stock_enabled %}
+        <a href="{{ url_for('owner.toggle_stock', item_id=i.id) }}" class="badge {{ 'active' if i.in_stock else 'suspended' }}" style="text-decoration:none">
+          {{ atext.in_stock if i.in_stock else atext.out_of_stock }}
+        </a>
+        {% endif %}
+        <a href="{{ url_for('owner.delete_menu_item', item_id=i.id) }}" class="btn danger" style="padding:5px 10px;font-size:11px"
+           onclick="return confirm('Permanently delete {{ i.name_primary|e }}? Past orders/reports are not affected.')">Delete</a>
+      </div>
+    </div>
+
+    {% if cat and cat.multi_portion_enabled %}
+      <p style="font-size:12px;color:#9a9186;margin:6px 0">Portion tiers:</p>
+      <table>
+        <tr><th>Label</th><th>Serves</th><th>{{ atext.price }}</th><th></th></tr>
+        {% for t in tiers_by_item.get(i.id, []) %}
+        <tr>
+          <td>{{ t.label }}</td><td>{{ t.serves_count or '—' }}</td><td>{{ t.price }}</td>
+          <td><a href="{{ url_for('owner.tier_delete', tier_id=t.id) }}" class="btn danger" style="padding:4px 8px;font-size:11px">Remove</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="color:#9a9186">No tiers yet — add one below.</td></tr>
+        {% endfor %}
+      </table>
+      <form method="POST" action="{{ url_for('owner.tier_add', item_id=i.id) }}" style="display:flex;gap:8px;align-items:end;margin-top:8px;flex-wrap:wrap">
+        <div><label>Label</label><input name="label" placeholder="e.g. Small" required style="width:120px"></div>
+        <div><label>Serves</label><input type="number" name="serves_count" placeholder="2" style="width:70px"></div>
+        <div><label>{{ atext.price }}</label><input type="number" step="0.01" name="price" required style="width:100px"></div>
+        <button type="submit" style="height:41px">+ Add Tier</button>
+      </form>
+    {% else %}
+      <p style="font-size:13px;margin:6px 0">{{ atext.price }}: {{ i.price }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

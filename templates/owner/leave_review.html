@@ -1,0 +1,16 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+<div class="card" style="max-width:480px">
+  <h3 style="margin-top:0">{{ atext.leave_review }}</h3>
+  <form method="POST">
+    <label>{{ atext.rating }}</label>
+    <select name="rating">
+      <option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option>
+      <option value="2">★★</option><option value="1">★</option>
+    </select>
+    <label>{{ atext.review_text }}</label>
+    <textarea name="review_text" rows="4"></textarea>
+    <button type="submit" style="margin-top:14px">{{ atext.submit_review }}</button>
+  </form>
+</div>
+{% endblock %}

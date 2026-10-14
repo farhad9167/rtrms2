@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SellovateAI Restaurant OS — Owner Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--c1:#E2725B;--c2:#E8C872;--c3:#333333;--c4:#FDFBF7;--c5:#F5F0E6}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--c4);color:var(--c3);min-height:100vh}
+  .split{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+  @media (max-width:860px){ .split{grid-template-columns:1fr} }
+
+  .left{display:flex;flex-direction:column;justify-content:center;padding:48px;max-width:440px;margin:0 auto;width:100%}
+  .badge{display:inline-flex;padding:5px 12px;border-radius:14px;background:var(--c5);color:var(--c1);font-size:11px;font-weight:800;letter-spacing:.04em;margin-bottom:18px;width:fit-content}
+  .brand{font-size:14px;font-weight:800;color:var(--c1);margin-bottom:6px;letter-spacing:.02em}
+  h1{font-size:28px;font-weight:800;margin:0 0 10px;line-height:1.2}
+  .lead{color:#777;font-size:14px;margin:0 0 30px}
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-radius:12px;
+    font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;border:none;margin-bottom:12px;
+    transition:transform .15s ease;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--c3);color:#fff;box-shadow:0 6px 18px rgba(51,51,51,.2)}
+  .btn-outline{background:#fff;color:var(--c3);border:1.5px solid #e5ddd0}
+  .fine{color:#999;font-size:12px;text-align:center;margin-top:18px;line-height:1.5}
+  .fine a{color:var(--c1);font-weight:700;text-decoration:none}
+
+  .right{
+    background:linear-gradient(160deg,#2a2621,#1b1a17);color:#fff;display:flex;flex-direction:column;
+    justify-content:center;padding:48px;position:relative;overflow:hidden;
+  }
+  @media (max-width:860px){ .right{display:none} }
+  .right::before{
+    content:"";position:absolute;inset:-30% -10% auto -10%;height:70%;
+    background:radial-gradient(500px circle at 30% 20%, rgba(226,114,91,.18), transparent 70%);
+  }
+  .right h2{font-size:26px;font-weight:800;line-height:1.25;margin:0 0 14px;position:relative}
+  .right p.sub{color:#c9c0b3;font-size:13.5px;max-width:380px;margin:0 0 34px;position:relative}
+
+  .feature-cards{display:grid;gap:14px;position:relative}
+  .fcard{
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    padding:16px 18px;backdrop-filter:blur(6px);
+  }
+  .fcard .num{color:var(--c2);font-size:11px;font-weight:800;letter-spacing:.05em;margin-bottom:4px}
+  .fcard h4{margin:0 0 4px;font-size:14.5px;font-weight:700}
+  .fcard p{margin:0;color:#a9a099;font-size:12px}
+
+  .final-msg{margin-top:34px;color:#a9a099;font-size:12px;position:relative}
+  .final-msg b{color:#fff}
+</style>
+</head>
+<body>
+<div class="split">
+  <div class="left">
+    <div class="badge">🍽️ BUILT FOR RESTAURANTS</div>
+    <div class="brand">SellovateAI Restaurant OS</div>
+    <h1>Run your restaurant smarter.</h1>
+    <p class="lead">QR ordering, kitchen printing, and real-time sales — all in one simple platform. Sign in to get started.</p>
+
+    <a href="{{ url_for('owner.login_google') }}" class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 6 .9 8.3 2.6l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Continue with Google
+    </a>
+    <a href="{{ url_for('owner.login_username') }}" class="btn btn-outline">Sign in with Username</a>
+
+    <p class="fine">
+      New here? Continue with Google to create your restaurant account — you'll<br>
+      set up a username &amp; password afterward if you'd like an alternate login.<br><br>
+      By continuing you agree to our <a href="/terms">Terms</a> &amp; <a href="/privacy">Privacy Policy</a>.
+    </p>
+  </div>
+
+  <div class="right">
+    <h2>From Customer Order to<br>Kitchen — Everything Connected.</h2>
+    <p class="sub">Give customers a faster way to order while your kitchen and staff stay perfectly synchronized.</p>
+
+    <div class="feature-cards">
+      <div class="fcard"><div class="num">01 · QR DIGITAL MENU</div><h4>Customers scan. Browse. Order.</h4><p>No app needed — the menu opens right in their browser.</p></div>
+      <div class="fcard"><div class="num">02 · KITCHEN AUTOMATION</div><h4>Orders go directly to the kitchen.</h4><p>Printed the instant a customer taps "Place Order".</p></div>
+      <div class="fcard"><div class="num">03 · RESTAURANT ANALYTICS</div><h4>Know what's selling, in real time.</h4><p>Today's sales, best-sellers, and daily reports — one screen.</p></div>
+    </div>
+
+    <div class="final-msg"><b>One Platform. One Restaurant. Complete Control.</b><br>From the first scan to the final order, SellovateAI keeps your restaurant connected and ready to serve.</div>
+  </div>
+</div>
+</body></html>

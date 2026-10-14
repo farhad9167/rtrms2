@@ -1,0 +1,80 @@
+{% extends "owner/_base.html" %}
+{% block content %}
+
+{% if show_expiry_notice %}
+<div class="msg" style="border-left-color:#b3462c">
+  {{ atext.expiry_warning.format(days=days_left) }}
+  <a href="{{ url_for('owner.subscription') }}" class="btn" style="margin-left:10px">{{ atext.subscription }}</a>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">📊 Today's Sales</h3>
+  <div style="display:flex;gap:22px;flex-wrap:wrap;margin-bottom:10px">
+    <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase">Orders</span><br><strong style="font-size:20px">{{ today_sales.order_count }}</strong></div>
+    <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase">{{ atext.total }}</span><br><strong style="font-size:20px">{{ today_sales.total|round(0) }}</strong></div>
+  </div>
+  {% if today_sales.top_items %}
+  <div style="display:flex;flex-wrap:wrap;gap:6px">
+    {% for name, qty in today_sales.top_items %}
+    <span class="badge active" style="font-size:11px">{{ name }} × {{ qty }}</span>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:var(--muted);font-size:12.5px;margin:0">No sales yet today.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:13px">
+    <input type="checkbox" id="autoRefresh" style="width:auto"> {{ atext.auto_refresh }}
+  </label>
+</div>
+
+<table>
+  <tr><th>#</th><th>{{ atext.table }}</th><th>{{ atext.mode }}</th><th>{{ atext['items'] }}</th>
+      <th>{{ atext.total }}</th><th>{{ atext.status }}</th><th>{{ atext.payment }}</th><th>{{ atext.action }}</th></tr>
+  {% for o in orders %}
+  <tr>
+    <td>{{ o.id }}</td>
+    <td>{{ o.table_no }}</td>
+    <td>{{ o.dining_mode }}</td>
+    <td>{% for it in o.food_list %}{{ it.count }}x{{ it.name }}<br>{% endfor %}</td>
+    <td>{{ o.total_price }}</td>
+    <td>
+      <span class="badge {{ 'active' if o.status=='Completed' else 'pending' }}">{{ o.status }}</span>
+      {% if o.print_failed %}<span class="badge suspended" title="Kitchen print failed">🔔 Print Failed</span>{% endif %}
+    </td>
+    <td>{{ o.payment_method }}</td>
+    <td>
+      <a href="{{ url_for('owner.print_order', order_id=o.id) }}" class="btn secondary" style="padding:6px 10px;font-size:11px">{{ atext.print_copy }}</a>
+      {% if o.status != 'Completed' %}
+      <form method="POST" action="{{ url_for('owner.complete_payment', order_id=o.id) }}" style="display:inline">
+        <select name="payment_method" style="width:auto;display:inline;padding:4px">
+          <option>Cash</option><option>Card</option><option>Bank Transfer</option>
+        </select>
+        <button type="submit" style="padding:6px 10px">{{ atext.mark_paid }}</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8">{{ atext.no_orders }}</td></tr>
+  {% endfor %}
+</table>
+
+<audio id="alertSound" src="/static/alert.wav" preload="auto"></audio>
+<script>
+document.getElementById('autoRefresh').addEventListener('change', function(){
+  if(this.checked){ window._t = setInterval(()=>location.reload(), 30000); }
+  else { clearInterval(window._t); }
+});
+{% set has_print_failure = orders|selectattr('print_failed')|list %}
+{% if has_print_failure %}
+document.addEventListener('DOMContentLoaded', function(){
+  var a = document.getElementById('alertSound');
+  if(a){ a.play().catch(()=>{}); }
+});
+{% endif %}
+</script>
+{% endblock %}

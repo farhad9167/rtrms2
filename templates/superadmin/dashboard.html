@@ -1,0 +1,54 @@
+{% extends "superadmin/_base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="grid cols-3">
+  <div class="card stat"><div class="num">{{ restaurants|length }}</div><div class="lbl">Total Restaurants</div></div>
+  <div class="card stat"><div class="num">{{ active_count }}</div><div class="lbl">Active Subscriptions</div></div>
+  <div class="card stat"><div class="num">{{ pending_payments|length }}</div><div class="lbl">Pending Verifications</div></div>
+</div>
+
+{% if pending_payments %}
+<div class="card">
+  <h3 style="margin-top:0">Pending Payment Verifications</h3>
+  <table>
+    <tr><th>Restaurant</th><th>Sender</th><th>Number</th><th>Note</th><th>Submitted</th><th>Action</th></tr>
+    {% for p in pending_payments %}
+    <tr>
+      <td>{{ p.restaurant_id }}</td>
+      <td>{{ p.sender_name }}</td>
+      <td>{{ p.sender_number }}</td>
+      <td>{{ p.transaction_note }}</td>
+      <td>{{ p.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>
+        <a href="{{ url_for('superadmin.review_payment', pr_id=p.id, action='approve') }}" class="btn">Approve</a>
+        <a href="{{ url_for('superadmin.review_payment', pr_id=p.id, action='reject') }}" class="btn danger">Reject</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">All Restaurants</h3>
+  <table>
+    <tr><th>Name</th><th>Country</th><th>Status</th><th>Expiry</th><th>Owner Email</th><th>Action</th></tr>
+    {% for r in restaurants %}
+    <tr>
+      <td>{{ r.name }}</td>
+      <td>{{ r.country_code }}</td>
+      <td><span class="badge {{ r.subscription_status }}">{{ r.subscription_status }}</span></td>
+      <td>{{ r.subscription_expiry or '—' }}</td>
+      <td>{{ r.owner_email }}</td>
+      <td>
+        {% if r.subscription_status == 'suspended' %}
+        <a href="{{ url_for('superadmin.restaurant_action', rid=r.id, action='activate') }}" class="btn">Activate</a>
+        {% else %}
+        <a href="{{ url_for('superadmin.restaurant_action', rid=r.id, action='suspend') }}" class="btn danger">Suspend</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
